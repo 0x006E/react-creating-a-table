@@ -1,12 +1,9 @@
 import React from "react";
 
-const ReadOnlyRow = ({ contact, handleEditClick, handleDeleteClick }) => {
+const ReadOnlyRow = ({ columns,columnAttributes, contact, handleEditClick, handleDeleteClick }) => {
   return (
     <tr>
-      <td>{contact.fullName}</td>
-      <td>{contact.address}</td>
-      <td>{contact.phoneNumber}</td>
-      <td>{contact.email}</td>
+      {columns.map(i=>columnAttriubutes.map(attr=><td>{contact[i][attr]}</td>))}
       <td>
         <button
           type="button"

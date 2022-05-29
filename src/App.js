@@ -1,18 +1,31 @@
-import React, { useState, Fragment } from "react";
 import { nanoid } from "nanoid";
+import React, { createRef, Fragment, useState } from "react";
 import "./App.css";
-import data from "./mock-data.json";
-import ReadOnlyRow from "./components/ReadOnlyRow";
 import EditableRow from "./components/EditableRow";
+import ReadOnlyRow from "./components/ReadOnlyRow";
+import getFormData from "./getFormData";
+import data from "./mock-data.json";
 
 const App = () => {
+  const addFormRef = createRef();
+  const columns = [
+    "fourteenkg",
+    "nineteenkg",
+    "fivekg",
+    "BMCG",
+    "thirtykg",
+    "fourtysevenpointfivekg",
+  ];
+  const column_attr = ["full", "mt", "def", "tot"];
   const [contacts, setContacts] = useState(data);
-  const [addFormData, setAddFormData] = useState({
-    fullName: "",
-    address: "",
-    phoneNumber: "",
-    email: "",
-  });
+  const [addFormData, setAddFormData] = useState([
+    {
+      fullName: "",
+      address: "",
+      phoneNumber: "",
+      email: "",
+    },
+  ]);
 
   const [editFormData, setEditFormData] = useState({
     fullName: "",
@@ -50,16 +63,16 @@ const App = () => {
   const handleAddFormSubmit = (event) => {
     event.preventDefault();
 
-    const newContact = {
+    let data = getFormData(addFormRef);
+    // columns.forEach((i) =>
+    //             column_attr.map((attr, idx) => <th key={idx}>{attr}</th>)
+
+    const newRow = {
       id: nanoid(),
-      fullName: addFormData.fullName,
-      address: addFormData.address,
-      phoneNumber: addFormData.phoneNumber,
-      email: addFormData.email,
+      ...data,
     };
 
-    const newContacts = [...contacts, newContact];
-    setContacts(newContacts);
+    setContacts((prevContacts) => [...prevContacts, newRow]);
   };
 
   const handleEditFormSubmit = (event) => {
@@ -114,14 +127,20 @@ const App = () => {
   return (
     <div className="app-container">
       <form onSubmit={handleEditFormSubmit}>
-        <table>
+        <table style={{ fontSize: "12px" }}>
           <thead>
+            <th>PRODUCT</th>
+            {columns.map((i, idx) => (
+              <th key={idx} colspan="4">
+                {i}
+              </th>
+            ))}
+
             <tr>
-              <th>Name</th>
-              <th>Address</th>
-              <th>Phone Number</th>
-              <th>Email</th>
-              <th>Actions</th>
+              <th>LOC/VEHICLE</th>
+              {columns.map((i) =>
+                column_attr.map((attr, idx) => <th key={idx}>{attr}</th>)
+              )}
             </tr>
           </thead>
           <tbody>
@@ -129,12 +148,16 @@ const App = () => {
               <Fragment>
                 {editContactId === contact.id ? (
                   <EditableRow
+                    columns={columns}
+                    columnAtrtibutes={column_attr}
                     editFormData={editFormData}
                     handleEditFormChange={handleEditFormChange}
                     handleCancelClick={handleCancelClick}
                   />
                 ) : (
                   <ReadOnlyRow
+                    columns={columns}
+                    columnAtrtibutes={column_attr}
                     contact={contact}
                     handleEditClick={handleEditClick}
                     handleDeleteClick={handleDeleteClick}
@@ -145,39 +168,40 @@ const App = () => {
           </tbody>
         </table>
       </form>
-
-      <h2>Add a Contact</h2>
-      <form onSubmit={handleAddFormSubmit}>
-        <input
-          type="text"
-          name="fullName"
-          required="required"
-          placeholder="Enter a name..."
-          onChange={handleAddFormChange}
-        />
-        <input
-          type="text"
-          name="address"
-          required="required"
-          placeholder="Enter an addres..."
-          onChange={handleAddFormChange}
-        />
-        <input
-          type="text"
-          name="phoneNumber"
-          required="required"
-          placeholder="Enter a phone number..."
-          onChange={handleAddFormChange}
-        />
-        <input
-          type="email"
-          name="email"
-          required="required"
-          placeholder="Enter an email..."
-          onChange={handleAddFormChange}
-        />
-        <button type="submit">Add</button>
-      </form>
+      <div>
+        <h2>Add new</h2>
+        <form ref={addFormRef} onSubmit={handleAddFormSubmit}>
+          <>
+            <label htmlFor={`LOC`}>LOC</label>
+            <input type="text" name={`LOC`} placeholder="LOC" />
+          </>
+          {columns.map((i) => {
+            let body = [];
+            body.push(
+              <>
+                <label>{i}</label>
+              </>
+            );
+            body.push(
+              <div>
+                {column_attr.map((attr) => (
+                  <>
+                    <label htmlFor={`${i}.${attr}`}>{attr}</label>
+                    <input
+                      type="text"
+                      name={`${i}.${attr}`}
+                      size="2"
+                      defaultValue={15}
+                    />
+                  </>
+                ))}
+              </div>
+            );
+            return body;
+          })}
+          <button type="submit">Add</button>
+        </form>
+      </div>
     </div>
   );
 };
