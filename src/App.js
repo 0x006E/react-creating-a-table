@@ -9,53 +9,67 @@ import data from "./mock-data.json";
 const App = () => {
   const addFormRef = createRef();
   const columns = [
-    "fourteenkg",
-    "nineteenkg",
+    "forteenkg",
+    "ninteenkg",
     "fivekg",
-    "BMCG",
-    "thirtykg",
-    "fourtysevenpointfivekg",
+    "bmcg",
+    "thirtyfivekg",
+    "fourtysevenkg",
   ];
   const column_attr = ["full", "mt", "def", "tot"];
   const [contacts, setContacts] = useState(data);
-  const [addFormData, setAddFormData] = useState([
-    {
-      fullName: "",
-      address: "",
-      phoneNumber: "",
-      email: "",
-    },
-  ]);
 
   const [editFormData, setEditFormData] = useState({
-    fullName: "",
-    address: "",
-    phoneNumber: "",
-    email: "",
+    loc: "",
+    forteenkg: {
+      full: 0,
+      mt: 0,
+      def: 0,
+      tot: 0,
+    },
+    ninteenkg: {
+      full: 0,
+      mt: 0,
+      def: 0,
+      tot: 0,
+    },
+    fivekg: {
+      full: 0,
+      mt: 0,
+      def: 0,
+      tot: 0,
+    },
+    bmcg: {
+      full: 0,
+      mt: 0,
+      def: 0,
+      tot: 0,
+    },
+    thirtyfivekg: {
+      full: 0,
+      mt: 0,
+      def: 0,
+      tot: 0,
+    },
+    fourtysevenkg: {
+      full: 0,
+      mt: 0,
+      def: 0,
+      tot: 0,
+    },
   });
 
   const [editContactId, setEditContactId] = useState(null);
-
-  const handleAddFormChange = (event) => {
-    event.preventDefault();
-
-    const fieldName = event.target.getAttribute("name");
-    const fieldValue = event.target.value;
-
-    const newFormData = { ...addFormData };
-    newFormData[fieldName] = fieldValue;
-
-    setAddFormData(newFormData);
-  };
 
   const handleEditFormChange = (event) => {
     event.preventDefault();
 
     const fieldName = event.target.getAttribute("name");
     const fieldValue = event.target.value;
+    let fieldNames = fieldName.split(".");
 
     const newFormData = { ...editFormData };
-    newFormData[fieldName] = fieldValue;
+    newFormData[fieldNames[0]][fieldNames[1]] = fieldValue;
 
     setEditFormData(newFormData);
   };
@@ -80,10 +94,7 @@ const App = () => {
 
     const editedContact = {
       id: editContactId,
-      fullName: editFormData.fullName,
-      address: editFormData.address,
-      phoneNumber: editFormData.phoneNumber,
-      email: editFormData.email,
+      ...editFormData,
     };
 
     const newContacts = [...contacts];
@@ -101,11 +112,9 @@ const App = () => {
     setEditContactId(contact.id);
 
     const formValues = {
-      fullName: contact.fullName,
-      address: contact.address,
-      phoneNumber: contact.phoneNumber,
-      email: contact.email,
+      ...contact,
     };
+    delete formValues.id;
 
     setEditFormData(formValues);
   };
@@ -129,13 +138,14 @@ const App = () => {
       <form onSubmit={handleEditFormSubmit}>
         <table style={{ fontSize: "12px" }}>
           <thead>
-            <th>PRODUCT</th>
-            {columns.map((i, idx) => (
-              <th key={idx} colspan="4">
-                {i}
-              </th>
-            ))}
-
+            <tr>
+              <th>PRODUCT</th>
+              {columns.map((i, idx) => (
+                <th key={idx} colSpan="4">
+                  {i}
+                </th>
+              ))}
+            </tr>
             <tr>
               <th>LOC/VEHICLE</th>
               {columns.map((i) =>
@@ -148,16 +158,18 @@ const App = () => {
               <Fragment>
                 {editContactId === contact.id ? (
                   <EditableRow
+                    key={contact.id}
                     columns={columns}
-                    columnAtrtibutes={column_attr}
+                    columnAttributes={column_attr}
                     editFormData={editFormData}
                     handleEditFormChange={handleEditFormChange}
                     handleCancelClick={handleCancelClick}
                   />
                 ) : (
                   <ReadOnlyRow
+                    key={contact.id}
                     columns={columns}
-                    columnAtrtibutes={column_attr}
+                    columnAttributes={column_attr}
                     contact={contact}
                     handleEditClick={handleEditClick}
                     handleDeleteClick={handleDeleteClick}
@@ -172,32 +184,32 @@ const App = () => {
         <h2>Add new</h2>
         <form ref={addFormRef} onSubmit={handleAddFormSubmit}>
           <>
-            <label htmlFor={`LOC`}>LOC</label>
-            <input type="text" name={`LOC`} placeholder="LOC" />
+            <label htmlFor={`loc`}>LOC</label>
+            <input type="text" name={`loc`} placeholder="LOC" />
           </>
           {columns.map((i) => {
             let body = [];
             body.push(
               <>
-                <label>{i}</label>
+                <label key={`${i}`}>{i}</label>
               </>
             );
             body.push(
               <div>
                 {column_attr.map((attr) => (
-                  <>
-                    <label htmlFor={`${i}.${attr}`}>{attr}</label>
+                  <div key={`${i}.${attr}-add`}>
+                    <label htmlFor= .{`${i}.${attr}`}>{attr}</label>
                     <input
                       type="text"
                       name={`${i}.${attr}`}
-                      size="2"
-                      defaultValue={15}
+                      size="1"
+                      defaultValue={0}
                     />
-                  </>
+                  </div>
                 ))}
               </div>
             );
-            return body;
+            return <div key={i + "1"}>{body}</div>;
           })}
           <button type="submit">Add</button>
         </form>
