@@ -198,7 +198,7 @@ const App = () => {
               <div>
                 {column_attr.map((attr) => (
                   <div key={`${i}.${attr}-add`}>
-                    <label htmlFor= .{`${i}.${attr}`}>{attr}</label>
+                    <label htmlFor={`${i}.${attr}`}>{attr}</label>
                     <input
                       type="text"
                       name={`${i}.${attr}`}
