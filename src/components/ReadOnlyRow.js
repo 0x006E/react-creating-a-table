@@ -6,17 +6,30 @@ const ReadOnlyRow = ({
   contact,
   handleEditClick = null,
   handleDeleteClick = null,
+  isHeader = false,
 }) => {
   return (
     <tr>
-      <td>{contact["loc"]}</td>
-      {columns.map((i) =>
-        columnAttributes.map((attr) => (
-          <td key={`${i}.${attr}-read`}>{contact[i] && contact[i][attr]}</td>
-        ))
+      {!isHeader ? (
+        <td>{contact["loc"]}</td>
+      ) : (
+        <th>
+          <b>{contact["loc"]}</b>
+        </th>
       )}
-      <td>
-        {handleEditClick && handleDeleteClick && (
+      {columns.map((i) =>
+        columnAttributes.map((attr) =>
+          !isHeader ? (
+            <td key={`${i}.${attr}-read`}>{contact[i] && contact[i][attr]}</td>
+          ) : (
+            <th key={`${i}.${attr}-read`}>
+              <b>{contact[i] && contact[i][attr]}</b>
+            </th>
+          )
+        )
+      )}
+      {handleEditClick && handleDeleteClick && (
+        <td>
           <>
             <button
               type="button"
@@ -28,8 +41,8 @@ const ReadOnlyRow = ({
               Delete
             </button>
           </>
-        )}
-      </td>
+        </td>
+      )}
     </tr>
   );
 };

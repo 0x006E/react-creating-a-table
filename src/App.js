@@ -1,4 +1,4 @@
-import { nanoid } from "nanoid";
+import { cloneDeep } from "lodash";
 import React, { createRef, Fragment, useEffect, useState } from "react";
 import "./App.css";
 import EditableRow from "./components/EditableRow";
@@ -16,131 +16,64 @@ const columns = [
 ];
 const column_attr = ["full", "mt", "def", "tot"];
 
+const empty_data = {
+  loc: "",
+  forteenkg: {
+    full: 0,
+    mt: 0,
+    def: 0,
+    tot: 0,
+  },
+  ninteenkg: {
+    full: 0,
+    mt: 0,
+    def: 0,
+    tot: 0,
+  },
+  fivekg: {
+    full: 0,
+    mt: 0,
+    def: 0,
+    tot: 0,
+  },
+  bmcg: {
+    full: 0,
+    mt: 0,
+    def: 0,
+    tot: 0,
+  },
+  thirtyfivekg: {
+    full: 0,
+    mt: 0,
+    def: 0,
+    tot: 0,
+  },
+  fourtysevenkg: {
+    full: 0,
+    mt: 0,
+    def: 0,
+    tot: 0,
+  },
+};
+
 const App = () => {
   const addFormRef = createRef();
 
   const [contacts, setContacts] = useState(data);
-  const [total, setTotal] = useState({
-    loc: "Total",
-    forteenkg: {
-      full: 0,
-      mt: 0,
-      def: 0,
-      tot: 0,
-    },
-    ninteenkg: {
-      full: 0,
-      mt: 0,
-      def: 0,
-      tot: 0,
-    },
-    fivekg: {
-      full: 0,
-      mt: 0,
-      def: 0,
-      tot: 0,
-    },
-    bmcg: {
-      full: 0,
-      mt: 0,
-      def: 0,
-      tot: 0,
-    },
-    thirtyfivekg: {
-      full: 0,
-      mt: 0,
-      def: 0,
-      tot: 0,
-    },
-    fourtysevenkg: {
-      full: 0,
-      mt: 0,
-      def: 0,
-      tot: 0,
-    },
-  });
+  const [total, setTotal] = useState(
+    (function () {
+      const temp = cloneDeep(empty_data);
+      temp.loc = "Total";
+      return temp;
+    })()
+  );
 
-  const [editFormData, setEditFormData] = useState({
-    loc: "",
-    forteenkg: {
-      full: 0,
-      mt: 0,
-      def: 0,
-      tot: 0,
-    },
-    ninteenkg: {
-      full: 0,
-      mt: 0,
-      def: 0,
-      tot: 0,
-    },
-    fivekg: {
-      full: 0,
-      mt: 0,
-      def: 0,
-      tot: 0,
-    },
-    bmcg: {
-      full: 0,
-      mt: 0,
-      def: 0,
-      tot: 0,
-    },
-    thirtyfivekg: {
-      full: 0,
-      mt: 0,
-      def: 0,
-      tot: 0,
-    },
-    fourtysevenkg: {
-      full: 0,
-      mt: 0,
-      def: 0,
-      tot: 0,
-    },
-  });
+  const [editFormData, setEditFormData] = useState(cloneDeep(empty_data));
 
   useEffect(() => {
-    let temp = {};
-    temp = {
-      loc: "Total",
-      forteenkg: {
-        full: 0,
-        mt: 0,
-        def: 0,
-        tot: 0,
-      },
-      ninteenkg: {
-        full: 0,
-        mt: 0,
-        def: 0,
-        tot: 0,
-      },
-      fivekg: {
-        full: 0,
-        mt: 0,
-        def: 0,
-        tot: 0,
-      },
-      bmcg: {
-        full: 0,
-        mt: 0,
-        def: 0,
-        tot: 0,
-      },
-      thirtyfivekg: {
-        full: 0,
-        mt: 0,
-        def: 0,
-        tot: 0,
-      },
-      fourtysevenkg: {
-        full: 0,
-        mt: 0,
-        def: 0,
-        tot: 0,
-      },
-    };
+    let temp = cloneDeep(empty_data);
+    temp.loc = "Total";
+
     setTotal((_) => {
       contacts.forEach((contact) => {
         columns.forEach((column) => {
@@ -158,37 +91,6 @@ const App = () => {
 
   const [editContactId, setEditContactId] = useState(null);
 
-  const handleEditFormChange = (event) => {
-    event.preventDefault();
-
-    const fieldName = event.target.getAttribute("name");
-    const fieldValue = event.target.value;
-    const newFormData = { ...editFormData };
-
-    if (fieldName === "loc") {
-      newFormData.loc = fieldValue;
-      setEditFormData(newFormData);
-      return;
-    }
-
-    let fieldNames = fieldName.split(".");
-
-    newFormData[fieldNames[0]][fieldNames[1]] = fieldValue;
-    if (fieldNames[1] !== "tot") {
-      let sum = 0;
-      column_attr
-        .filter((i) => i !== "tot")
-        .forEach((attr) => {
-          sum += isNaN(parseInt(newFormData[fieldNames[0]][attr]))
-            ? 0
-            : parseInt(newFormData[fieldNames[0]][attr]);
-        });
-      newFormData[fieldNames[0]]["tot"] = sum;
-    }
-
-    setEditFormData(newFormData);
-  };
-
   const handleAddFormSubmit = (event) => {
     event.preventDefault();
 
@@ -197,7 +99,7 @@ const App = () => {
     //             column_attr.map((attr, idx) => <th key={idx}>{attr}</th>)
 
     const newRow = {
-      id: nanoid(),
+      id: contacts[contacts.length - 1].id + 1,
       ...data,
     };
 
@@ -214,13 +116,11 @@ const App = () => {
     setContacts((prevContacts) => [...prevContacts, newRow]);
   };
 
-  const handleEditFormSubmit = (event) => {
+  const handleEditFormSubmit = (event, formData) => {
     event.preventDefault();
 
-    const editedContact = {
-      id: editContactId,
-      ...editFormData,
-    };
+    const editedContact = cloneDeep(formData);
+    editedContact["id"] = editContactId;
 
     const newContacts = [...contacts];
 
@@ -287,7 +187,7 @@ const App = () => {
                     columns={columns}
                     columnAttributes={column_attr}
                     editFormData={editFormData}
-                    handleEditFormChange={handleEditFormChange}
+                    handleEditFormSubmit={handleEditFormSubmit}
                     handleCancelClick={handleCancelClick}
                   />
                 ) : (
@@ -306,6 +206,7 @@ const App = () => {
               columns={columns}
               columnAttributes={column_attr}
               contact={total}
+              isHeader={true}
             />
           </tbody>
         </table>
