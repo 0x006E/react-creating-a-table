@@ -28,6 +28,7 @@ const EditableRow = ({
               onChange={handleEditFormChange}
               value={editFormData[i][attr]}
               size="1"
+              disabled={attr === "tot"}
             />
           </td>
         ))

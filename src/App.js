@@ -1,23 +1,64 @@
 import { nanoid } from "nanoid";
-import React, { createRef, Fragment, useState } from "react";
+import React, { createRef, Fragment, useEffect, useState } from "react";
 import "./App.css";
 import EditableRow from "./components/EditableRow";
 import ReadOnlyRow from "./components/ReadOnlyRow";
 import getFormData from "./getFormData";
 import data from "./mock-data.json";
 
+const columns = [
+  "forteenkg",
+  "ninteenkg",
+  "fivekg",
+  "bmcg",
+  "thirtyfivekg",
+  "fourtysevenkg",
+];
+const column_attr = ["full", "mt", "def", "tot"];
+
 const App = () => {
   const addFormRef = createRef();
-  const columns = [
-    "forteenkg",
-    "ninteenkg",
-    "fivekg",
-    "bmcg",
-    "thirtyfivekg",
-    "fourtysevenkg",
-  ];
-  const column_attr = ["full", "mt", "def", "tot"];
+
   const [contacts, setContacts] = useState(data);
+  const [total, setTotal] = useState({
+    loc: "Total",
+    forteenkg: {
+      full: 0,
+      mt: 0,
+      def: 0,
+      tot: 0,
+    },
+    ninteenkg: {
+      full: 0,
+      mt: 0,
+      def: 0,
+      tot: 0,
+    },
+    fivekg: {
+      full: 0,
+      mt: 0,
+      def: 0,
+      tot: 0,
+    },
+    bmcg: {
+      full: 0,
+      mt: 0,
+      def: 0,
+      tot: 0,
+    },
+    thirtyfivekg: {
+      full: 0,
+      mt: 0,
+      def: 0,
+      tot: 0,
+    },
+    fourtysevenkg: {
+      full: 0,
+      mt: 0,
+      def: 0,
+      tot: 0,
+    },
+  });
 
   const [editFormData, setEditFormData] = useState({
     loc: "",
@@ -59,6 +100,62 @@ const App = () => {
     },
   });
 
+  useEffect(() => {
+    let temp = {};
+    temp = {
+      loc: "Total",
+      forteenkg: {
+        full: 0,
+        mt: 0,
+        def: 0,
+        tot: 0,
+      },
+      ninteenkg: {
+        full: 0,
+        mt: 0,
+        def: 0,
+        tot: 0,
+      },
+      fivekg: {
+        full: 0,
+        mt: 0,
+        def: 0,
+        tot: 0,
+      },
+      bmcg: {
+        full: 0,
+        mt: 0,
+        def: 0,
+        tot: 0,
+      },
+      thirtyfivekg: {
+        full: 0,
+        mt: 0,
+        def: 0,
+        tot: 0,
+      },
+      fourtysevenkg: {
+        full: 0,
+        mt: 0,
+        def: 0,
+        tot: 0,
+      },
+    };
+    setTotal((_) => {
+      contacts.forEach((contact) => {
+        columns.forEach((column) => {
+          column_attr.forEach((attr) => {
+            temp[column][attr] += parseInt(contact[column][attr]);
+          });
+        });
+      });
+      return temp;
+    });
+    return () => {
+      temp = {};
+    };
+  }, [contacts]);
+
   const [editContactId, setEditContactId] = useState(null);
 
   const handleEditFormChange = (event) => {
@@ -66,10 +163,28 @@ const App = () => {
 
     const fieldName = event.target.getAttribute("name");
     const fieldValue = event.target.value;
+    const newFormData = { ...editFormData };
+
+    if (fieldName === "loc") {
+      newFormData.loc = fieldValue;
+      setEditFormData(newFormData);
+      return;
+    }
+
     let fieldNames = fieldName.split(".");
 
-    const newFormData = { ...editFormData };
     newFormData[fieldNames[0]][fieldNames[1]] = fieldValue;
+    if (fieldNames[1] !== "tot") {
+      let sum = 0;
+      column_attr
+        .filter((i) => i !== "tot")
+        .forEach((attr) => {
+          sum += isNaN(parseInt(newFormData[fieldNames[0]][attr]))
+            ? 0
+            : parseInt(newFormData[fieldNames[0]][attr]);
+        });
+      newFormData[fieldNames[0]]["tot"] = sum;
+    }
 
     setEditFormData(newFormData);
   };
@@ -85,6 +200,16 @@ const App = () => {
       id: nanoid(),
       ...data,
     };
+
+    columns.forEach((column) => {
+      let sum = 0;
+      column_attr.forEach((attr) => {
+        sum += isNaN(parseInt(newRow[column][attr]))
+          ? 0
+          : parseInt(newRow[column][attr]);
+      });
+      newRow[column]["tot"] = sum;
+    });
 
     setContacts((prevContacts) => [...prevContacts, newRow]);
   };
@@ -177,6 +302,11 @@ const App = () => {
                 )}
               </Fragment>
             ))}
+            <ReadOnlyRow
+              columns={columns}
+              columnAttributes={column_attr}
+              contact={total}
+            />
           </tbody>
         </table>
       </form>
@@ -196,17 +326,19 @@ const App = () => {
             );
             body.push(
               <div>
-                {column_attr.map((attr) => (
-                  <div key={`${i}.${attr}-add`}>
-                    <label htmlFor={`${i}.${attr}`}>{attr}</label>
-                    <input
-                      type="text"
-                      name={`${i}.${attr}`}
-                      size="1"
-                      defaultValue={0}
-                    />
-                  </div>
-                ))}
+                {column_attr
+                  .filter((i) => i !== "tot")
+                  .map((attr) => (
+                    <div key={`${i}.${attr}-add`}>
+                      <label htmlFor={`${i}.${attr}`}>{attr}</label>
+                      <input
+                        type="text"
+                        name={`${i}.${attr}`}
+                        size="1"
+                        defaultValue={0}
+                      />
+                    </div>
+                  ))}
               </div>
             );
             return <div key={i + "1"}>{body}</div>;

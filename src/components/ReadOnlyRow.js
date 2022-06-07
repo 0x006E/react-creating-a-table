@@ -4,8 +4,8 @@ const ReadOnlyRow = ({
   columns,
   columnAttributes,
   contact,
-  handleEditClick,
-  handleDeleteClick,
+  handleEditClick = null,
+  handleDeleteClick = null,
 }) => {
   return (
     <tr>
@@ -16,15 +16,19 @@ const ReadOnlyRow = ({
         ))
       )}
       <td>
-        <button
-          type="button"
-          onClick={(event) => handleEditClick(event, contact)}
-        >
-          Edit
-        </button>
-        <button type="button" onClick={() => handleDeleteClick(contact.id)}>
-          Delete
-        </button>
+        {handleEditClick && handleDeleteClick && (
+          <>
+            <button
+              type="button"
+              onClick={(event) => handleEditClick(event, contact)}
+            >
+              Edit
+            </button>
+            <button type="button" onClick={() => handleDeleteClick(contact.id)}>
+              Delete
+            </button>
+          </>
+        )}
       </td>
     </tr>
   );
