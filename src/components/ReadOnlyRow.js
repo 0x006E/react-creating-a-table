@@ -22,8 +22,11 @@ const ReadOnlyRow = ({
         columnAttributes.map((attr) =>
           !isHeader ? (
             <td key={`${i}.${attr}-read`}>
-              {contact[i] &&
-                (contact.type === "in" ? 1 : -1) * contact[i][attr]}
+              {contact[i] && contact.type
+                ? contact.type === "in"
+                  ? 1
+                  : -1
+                : 1 * contact[i][attr]}
             </td>
           ) : (
             <th key={`${i}.${attr}-read`}>

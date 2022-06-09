@@ -6,14 +6,16 @@ import empty_data from "../empty_data.json";
 import getFormData from "../getFormData";
 import data from "../mock-data.json";
 
-const columns = [
-  "forteenkg",
-  "ninteenkg",
-  "fivekg",
-  "bmcg",
-  "thirtyfivekg",
-  "fourtysevenkg",
-];
+const columns_map = {
+  forteenkg: "14KG",
+  ninteenkg: "19KG",
+  fivekg: "5KG",
+  bmcg: "BMCG",
+  thirtyfivekg: "35KG",
+  fourtysevenkg: "47.5KG",
+};
+const columns = Object.keys(columns_map);
+const columns_hr = Object.values(columns_map);
 const column_attr = ["full", "mt", "def", "tot"];
 
 const Home = () => {
@@ -125,7 +127,7 @@ const Home = () => {
           <thead>
             <tr>
               <th>PRODUCT</th>
-              {columns.map((i, idx) => (
+              {columns_hr.map((i, idx) => (
                 <th key={idx} colSpan="4">
                   {i}
                 </th>
