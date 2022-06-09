@@ -45,3 +45,15 @@ form * {
 br {
   width: 100%;
 }
+
+.tr-special {
+  background-color: rgb(205, 235, 253);
+}
+
+[data-type="in"] td {
+  background-color: #bbf7d0;
+}
+
+[data-type="out"] td {
+  background-color: #fca5a5;
+}

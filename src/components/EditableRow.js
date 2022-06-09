@@ -7,6 +7,8 @@ const EditableRow = ({
   editFormData,
   handleEditFormSubmit,
   handleCancelClick,
+  multiplier = 1,
+  ...rest
 }) => {
   const [formData, setFormData] = React.useState(editFormData);
   const handleFormChange = (e) => {
@@ -26,7 +28,7 @@ const EditableRow = ({
 
     newFormData[fieldNames[0]][fieldNames[1]] = isNaN(parseInt(fieldValue))
       ? 0
-      : parseInt(fieldValue);
+      : multiplier * parseInt(fieldValue);
     if (fieldNames[1] !== "tot") {
       let sum = 0;
       columnAttributes
@@ -34,7 +36,7 @@ const EditableRow = ({
         .forEach((attr) => {
           sum += isNaN(parseInt(newFormData[fieldNames[0]][attr]))
             ? 0
-            : parseInt(newFormData[fieldNames[0]][attr]);
+            : multiplier * parseInt(newFormData[fieldNames[0]][attr]);
         });
       newFormData[fieldNames[0]]["tot"] = sum;
     }
@@ -42,7 +44,7 @@ const EditableRow = ({
     setFormData(newFormData);
   };
   return (
-    <tr>
+    <tr {...rest}>
       <td>
         <input
           type="text"
@@ -60,7 +62,7 @@ const EditableRow = ({
               type="text"
               name={`${i}.${attr}`}
               onChange={handleFormChange}
-              value={formData[i][attr]}
+              value={formData[i][attr] * multiplier}
               size="1"
               disabled={attr === "tot"}
             />

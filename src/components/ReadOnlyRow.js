@@ -7,9 +7,10 @@ const ReadOnlyRow = ({
   handleEditClick = null,
   handleDeleteClick = null,
   isHeader = false,
+  ...rest
 }) => {
   return (
-    <tr>
+    <tr {...rest}>
       {!isHeader ? (
         <td>{contact["loc"]}</td>
       ) : (
@@ -20,7 +21,10 @@ const ReadOnlyRow = ({
       {columns.map((i) =>
         columnAttributes.map((attr) =>
           !isHeader ? (
-            <td key={`${i}.${attr}-read`}>{contact[i] && contact[i][attr]}</td>
+            <td key={`${i}.${attr}-read`}>
+              {contact[i] &&
+                (contact.type === "in" ? 1 : -1) * contact[i][attr]}
+            </td>
           ) : (
             <th key={`${i}.${attr}-read`}>
               <b>{contact[i] && contact[i][attr]}</b>
